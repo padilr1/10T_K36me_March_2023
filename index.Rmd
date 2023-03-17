@@ -1,0 +1,208 @@
+---
+title: ""
+author: ""
+date: ""
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    collapsed: false
+    number_sections: false
+    toc_depth: 3
+    smooth_scroll: false
+    theme: cerulean
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+library(tidyverse)
+library(rtracklayer)
+library(ggplot2)
+library(plotly)
+setwd("~/Documents/10T_K36me_March_2023")
+```
+
+```{=html}
+<style>
+  .superbigimage{
+      overflow-x:scroll;
+      white-space: nowrap;
+  }
+
+  .superbigimage img{
+     max-width: none;
+  }
+
+</style>
+```
+
+# PCA
+
+Using log2 enrichment over input matrix as input to PCA (after scaling/centering)
+
+## Single KO {.tabset}
+
+### All
+
+We see a batch effect between Gerry's and Chao's samples.
+```{r,echo = FALSE, warning=FALSE,message=FALSE,out.width='100%'}
+load("data/singleKO_with_Chao.RData")
+pd <- p$data
+ggplotly(p,source = "select",tooltip = c("samp","batch"))
+```
+
+### Sans Chao's samples
+```{r,echo = FALSE, warning=FALSE,message=FALSE,out.width='100%'}
+load("data/singleKO_no_Chao.RData")
+pd <- p$data
+ggplotly(p,source = "select",tooltip = c("samp","batch"))
+```
+
+---
+
+## Multiple knockouts {.tabset}
+
+### All
+```{r,echo = FALSE, warning=FALSE,message=FALSE,out.width='100%'}
+load("data/multipleKO_with_Chao.RData")
+pd <- p$data
+ggplotly(p,source = "select",tooltip = c("samp","batch"))
+```
+
+### Sans Chao's samples
+```{r,echo = FALSE, warning=FALSE,message=FALSE,out.width='100%'}
+load("data/multipleKO_without_Chao.RData")
+pd <- p$data
+ggplotly(p,source = "select",tooltip = c("samp","batch"))
+```
+
+---
+
+## Overexpression {.tabset}
+
+### With multiple KOs
+
+Here we see NSD3-OE clustering with NSD12DKO whereas NSD1/2-OE clustering with QKO/QuiKO
+```{r,echo = FALSE, warning=FALSE,message=FALSE,out.width='100%'}
+load("data/multipleKO_with_OE.RData")
+pd <- p$data
+ggplotly(p,source = "select",tooltip = c("samp","batch"))
+```
+
+### Only OE samples
+
+Here we start to see clustering according to the NSD enzyme that is being overexpressed, albeit NSD1/2-OE samples cluster together whereas NSD3-OE samples clusters separately
+```{r,echo = FALSE, warning=FALSE,message=FALSE,out.width='100%'}
+load("data/OE.RData")
+pd <- p$data
+ggplotly(p,source = "select",tooltip = c("samp","batch"))
+```
+
+---
+
+# Correlation
+
+## Single KO {.tabset}
+
+### All {.tabset .tabset-pills}
+
+#### Pearson
+::: superbigimage
+```{r,echo = FALSE, warning=FALSE,message=FALSE,fig.width=9,fig.height=6}
+load("data/singleKO_with_Chao_pearson.RData")
+hm %>%
+  layout(height = 900)
+```
+:::
+
+#### Spearman
+::: superbigimage
+```{r,echo = FALSE, warning=FALSE,message=FALSE,fig.width=9,fig.height=6}
+load("data/singleKO_with_Chao_spearman.RData")
+hm %>%
+  layout(height = 900)
+```
+:::
+
+### Sans Chao's samples {.tabset .tabset-pills}
+
+#### Pearson
+::: superbigimage
+```{r,echo = FALSE, warning=FALSE,message=FALSE,fig.width=9,fig.height=6}
+load("data/singleKO_no_Chao_pearson.RData")
+hm %>%
+  layout(height = 900)
+```
+:::
+
+#### Spearman
+::: superbigimage
+```{r,echo = FALSE, warning=FALSE,message=FALSE,fig.width=9,fig.height=6}
+load("data/singleKO_with_no_spearman.RData")
+hm %>%
+  layout(height = 900)
+```
+:::
+
+---
+
+## Multiple KOs {.tabset .tabset-pills}
+
+### Pearson
+```{r,echo = FALSE, warning=FALSE,message=FALSE,out.width='100%'}
+load("data/multipleKO_no_Chao_pearson.RData")
+hm %>%
+  layout(height = 500)
+```
+
+### Spearman
+```{r,echo = FALSE, warning=FALSE,message=FALSE,out.width='100%'}
+load("data/multipleKO_with_no_Chao_spearman.RData")
+hm %>%
+  layout(height = 500)
+```
+
+---
+
+## Overexpression {.tabset}
+
+### With multiple KOs {.tabset .tabset-pills}
+
+#### Pearson
+::: superbigimage
+```{r,echo = FALSE, warning=FALSE,message=FALSE,fig.width=10,fig.height=6}
+load("data/multipleKO_with_OE_pearson.RData")
+hm %>%
+  layout(height = 900)
+```
+:::
+
+#### Spearman
+::: superbigimage
+```{r,echo = FALSE, warning=FALSE,message=FALSE,fig.width=10,fig.height=6}
+load("data/multipleKO_with_OE_spearman.RData")
+hm %>%
+  layout(height = 900)
+```
+:::
+
+### Only OE samples {.tabset .tabset-pills}
+
+#### Pearson
+::: superbigimage
+```{r,echo = FALSE, warning=FALSE,message=FALSE,fig.width=9,fig.height=6}
+load("data/OE_pearson.RData")
+hm %>%
+  layout(height = 500)
+```
+:::
+
+#### Spearman
+::: superbigimage
+```{r,echo = FALSE, warning=FALSE,message=FALSE,fig.width=9,fig.height=6}
+load("data/OE_spearman.RData")
+hm %>%
+  layout(height = 500)
+```
+:::

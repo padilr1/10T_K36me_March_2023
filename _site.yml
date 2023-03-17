@@ -1,0 +1,7 @@
+name: ""
+navbar:
+  title: "10T K36me2 March 2023"
+  left:
+    - text: "K36me2 summary"
+      href: index.html
+output_dir: "docs"
