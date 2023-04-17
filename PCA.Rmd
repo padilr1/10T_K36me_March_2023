@@ -1,0 +1,79 @@
+---
+title: ""
+author: ""
+date: ""
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    collapsed: false
+    number_sections: false
+    toc_depth: 3
+    smooth_scroll: false
+    theme: cerulean
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+library(tidyverse)
+library(rtracklayer)
+library(ggplot2)
+library(plotly)
+library(DESeq2)
+setwd("~/Documents/10T_K36me_March_2023")
+```
+
+```{=html}
+<style>
+  .superbigimage{
+      overflow-x:scroll;
+      white-space: nowrap;
+  }
+
+  .superbigimage img{
+     max-width: none;
+  }
+
+</style>
+```
+
+# ChIP-seq
+```{r,echo = FALSE, warning=FALSE,message=FALSE,out.width='100%'}
+load("~/Documents/10T_K36me_March_2023/data/pd.singleKO.RData")
+p <- pd %>%
+  ggplot(aes(x = pd[,2], y = pd[,3], color = cond,label=samp)) +
+  geom_point(size = 3, show.legend = T) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  xlab(label = paste(colnames(pd[2]))) +
+  ylab(label = paste(colnames(pd[3]))) +
+  labs(title = "log2 K36me2 enrichment over input")
+#
+ggplotly(p,source = "select",tooltip = c("samp"))
+```
+
+---
+
+# RNA-seq
+```{r,echo = FALSE, warning=FALSE,message=FALSE,out.width='100%'}
+load("~/Documents/10T_K36me_March_2023/data/mdat.10T.RData")
+load("~/Documents/10T_K36me_March_2023/data/dds_10T.RData")
+keep <- rowSums(counts(dds)) >= 10
+dds.filt <- dds[keep,]
+#
+vst <- varianceStabilizingTransformation(dds.filt)
+#
+rv <- rowVars(assay(vst))
+select <- order(rv, decreasing=T)[seq_len(min(500,length(rv)))]
+pc <- prcomp(t(assay(vst)[select,]))
+condition <- metadata$condition
+scores <- data.frame(pc$x, condition)
+percentage <- round(pc$sdev / sum(pc$sdev) * 100, 2)
+percentage <- paste( colnames(scores), "(", paste( as.character(percentage), "%", ")", sep="") )
+p <- plot_ly(scores,x=scores$PC1,y=scores$PC2,text=rownames(scores),mode="markers",color=factor(condition),marker=list(size=11),colors = "Dark2")
+p <- layout(p,title="",   xaxis = list(title = percentage[1]),
+            yaxis = list(title = percentage[2]))
+p
+```
+

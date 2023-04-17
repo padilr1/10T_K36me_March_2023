@@ -4,4 +4,6 @@ navbar:
   left:
     - text: "K36me2 summary"
       href: index.html
+    - text: "PCA singleKO"
+      href: PCA.html
 output_dir: "docs"

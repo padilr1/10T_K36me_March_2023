@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="" />
+
+
+<title>PCA.knit</title>
+
+<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.10.1/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">10T K36me2 March 2023</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">K36me2 summary</a>
+</li>
+<li>
+  <a href="PCA.html">PCA singleKO</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+
+</div>
+
+
+<style>
+  .superbigimage{
+      overflow-x:scroll;
+      white-space: nowrap;
+  }
+
+  .superbigimage img{
+     max-width: none;
+  }
+
+</style>
+<div id="chip-seq" class="section level1">
+<h1>ChIP-seq</h1>
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-c8d17b039686969f1cfd" style="width:100%;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-c8d17b039686969f1cfd">{"x":{"data":[{"x":[287.800863561607,305.411897774465,135.526569981348,-55.4164876597344,330.197642102592],"y":[-165.192803880189,-232.964259761671,-162.116213258912,-289.431122990516,-282.246595368728],"text":["samp: NSD1-KO-c3","samp: NSD1-KO-c7","samp: NSD1-KO-c9","samp: NSD1KO_c1","samp: NSD1KO_c6"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":11.3385826771654,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)"}},"hoveron":"points","name":"NSD1KO","legendgroup":"NSD1KO","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[127.464477410104,49.5707383349226,113.162470065609,-136.49574654083,-20.0975091342572],"y":[44.4190812424902,155.250381423249,-77.6678915543694,-191.610808299507,9.44889668216303],"text":["samp: NSD2-KO-c10","samp: NSD2-KO-c11","samp: NSD2-KO-c7","samp: NSD2KO_c5","samp: NSD2KO_c9"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(183,159,0,1)","opacity":1,"size":11.3385826771654,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(183,159,0,1)"}},"hoveron":"points","name":"NSD2KO","legendgroup":"NSD2KO","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-127.053703477442,-206.662688168066,59.6478266176082],"y":[56.081548718942,-13.6091038546782,132.985991035889],"text":["samp: NSD3KO_c12","samp: NSD3KO_c3","samp: NSD3KO_c4"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","opacity":1,"size":11.3385826771654,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,186,56,1)"}},"hoveron":"points","name":"NSD3KO","legendgroup":"NSD3KO","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[154.167277588747,78.6302905955885,52.650295414936],"y":[262.026959645166,166.501011988307,172.327487966195],"text":["samp: NSD3_unedit","samp: Parental-1","samp: Parental-2"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","opacity":1,"size":11.3385826771654,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)"}},"hoveron":"points","name":"PA","legendgroup":"PA","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-556.908472830102,-338.37611730858,-376.851729723041],"y":[-130.12870049783,36.1091543740264,-58.8163654103841],"text":["samp: SETD2-KO-c10","samp: SETD2-KO-c3","samp: SETD2-KO-c7"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","opacity":1,"size":11.3385826771654,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(97,156,255,1)"}},"hoveron":"points","name":"SETD2KO","legendgroup":"SETD2KO","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-50.0921896523596,165.978611092237,7.74568395463925],"y":[100.694846347545,253.49633545217,214.442170000647],"text":["samp: ASH1L-KO-c2","samp: ASH1L-KO-c3","samp: ASH1L-KO-c8"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(245,100,227,1)","opacity":1,"size":11.3385826771654,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(245,100,227,1)"}},"hoveron":"points","name":"ASH1LKO","legendgroup":"ASH1LKO","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[-601.263778576737,374.552947849227],"y":[0,0],"text":"","type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[0,0],"y":[-317.004027122301,289.59986377695],"text":"","type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.7625570776256,"r":7.30593607305936,"b":40.1826484018265,"l":48.9497716894977},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"title":{"text":"log2 K36me2 enrichment over input","font":{"color":"rgba(0,0,0,1)","family":"","size":17.5342465753425},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-601.263778576737,374.552947849227],"tickmode":"array","ticktext":["-600","-400","-200","0","200"],"tickvals":[-600,-400,-200,0,200],"categoryorder":"array","categoryarray":["-600","-400","-200","0","200"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"PC1 (21%)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-317.004027122301,289.59986377695],"tickmode":"array","ticktext":["-300","-200","-100","0","100","200"],"tickvals":[-300,-200,-100,0,100,200],"categoryorder":"array","categoryarray":["-300","-200","-100","0","100","200"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"PC2 (13%)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895},"title":{"text":"cond","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"select","attrs":{"245869bc0b75":{"x":{},"y":{},"colour":{},"label":{},"type":"scatter"},"24583894648e":{"yintercept":{}},"24581655c3a7":{"xintercept":{}}},"cur_data":"245869bc0b75","visdat":{"245869bc0b75":["function (y) ","x"],"24583894648e":["function (y) ","x"],"24581655c3a7":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<hr />
+</div>
+<div id="rna-seq" class="section level1">
+<h1>RNA-seq</h1>
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-d5f2923648a672c627ec" style="width:100%;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-d5f2923648a672c627ec">{"x":{"visdat":{"2458759b2057":["function () ","plotlyVisDat"]},"cur_data":"2458759b2057","attrs":{"2458759b2057":{"x":[-29.2990269292847,25.5743306729184,24.4252004407986,-13.0404692266664,29.7742986758828,34.8463950617125,29.038090049841,-20.4084859545907,-23.7873364513015,-31.6258454825181,-38.9181880915622,28.0922633143954,15.8416888571305,-21.3223487589981,-31.5712328582909,-25.9855521720337,-21.0393980440175,-20.9270807981724,14.0023307053612,25.0816944934824,25.2034784734504,26.0451940224631],"y":[-12.9607618985307,-15.8181965715641,-16.9936765705583,-2.87080828587721,-5.80186684834589,30.6390511662983,-3.59057436788768,2.06346905890656,24.1973168657331,30.974788280156,31.21878462,37.2234137757888,10.127965697988,-4.65315310994268,-19.925684109291,-30.1732339119747,-13.5812345870276,-13.7196428625559,16.95638561759,-10.2101419610534,-16.0806780587129,-17.0215219391385],"text":["ASH1L_KO_c2","ASH1L_KO_c3","ASH1L_KO_c8","NSD1_KO_c1","NSD1_KO_c3","NSD1_KO_c6","NSD1_KO_c7","NSD1_KO_c9","NSD2_KO_c10","NSD2_KO_c11","NSD2_KO_c5","NSD2_KO_c7","NSD2_KO_c9","NSD3_KO_c12","NSD3_KO_c3","NSD3_KO_c4","parental_1","parental_2","SETD2_KO_c10","SETD2_KO_c3","SETD2_KO_c7","sgNSD3_unedited_c2"],"mode":"markers","marker":{"size":11},"color":["ASH1L_KO","ASH1L_KO","ASH1L_KO","NSD1_KO","NSD1_KO","NSD1_KO","NSD1_KO","NSD1_KO","NSD2_KO","NSD2_KO","NSD2_KO","NSD2_KO","NSD2_KO","NSD3_KO","NSD3_KO","NSD3_KO","parental","parental","SETD2_KO","SETD2_KO","SETD2_KO","parental"],"colors":"Dark2","alpha_stroke":1,"sizes":[10,100],"spans":[1,20]}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"","xaxis":{"domain":[0,1],"automargin":true,"title":"PC1 ( 15.61%)"},"yaxis":{"domain":[0,1],"automargin":true,"title":"PC2 ( 11.68%)"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[-29.2990269292847,25.5743306729184,24.4252004407986],"y":[-12.9607618985307,-15.8181965715641,-16.9936765705583],"text":["ASH1L_KO_c2","ASH1L_KO_c3","ASH1L_KO_c8"],"mode":"markers","marker":{"color":"rgba(27,158,119,1)","size":11,"line":{"color":"rgba(27,158,119,1)"}},"type":"scatter","name":"ASH1L_KO","textfont":{"color":"rgba(27,158,119,1)"},"error_y":{"color":"rgba(27,158,119,1)"},"error_x":{"color":"rgba(27,158,119,1)"},"line":{"color":"rgba(27,158,119,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[-13.0404692266664,29.7742986758828,34.8463950617125,29.038090049841,-20.4084859545907],"y":[-2.87080828587721,-5.80186684834589,30.6390511662983,-3.59057436788768,2.06346905890656],"text":["NSD1_KO_c1","NSD1_KO_c3","NSD1_KO_c6","NSD1_KO_c7","NSD1_KO_c9"],"mode":"markers","marker":{"color":"rgba(217,95,2,1)","size":11,"line":{"color":"rgba(217,95,2,1)"}},"type":"scatter","name":"NSD1_KO","textfont":{"color":"rgba(217,95,2,1)"},"error_y":{"color":"rgba(217,95,2,1)"},"error_x":{"color":"rgba(217,95,2,1)"},"line":{"color":"rgba(217,95,2,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[-23.7873364513015,-31.6258454825181,-38.9181880915622,28.0922633143954,15.8416888571305],"y":[24.1973168657331,30.974788280156,31.21878462,37.2234137757888,10.127965697988],"text":["NSD2_KO_c10","NSD2_KO_c11","NSD2_KO_c5","NSD2_KO_c7","NSD2_KO_c9"],"mode":"markers","marker":{"color":"rgba(117,112,179,1)","size":11,"line":{"color":"rgba(117,112,179,1)"}},"type":"scatter","name":"NSD2_KO","textfont":{"color":"rgba(117,112,179,1)"},"error_y":{"color":"rgba(117,112,179,1)"},"error_x":{"color":"rgba(117,112,179,1)"},"line":{"color":"rgba(117,112,179,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[-21.3223487589981,-31.5712328582909,-25.9855521720337],"y":[-4.65315310994268,-19.925684109291,-30.1732339119747],"text":["NSD3_KO_c12","NSD3_KO_c3","NSD3_KO_c4"],"mode":"markers","marker":{"color":"rgba(231,41,138,1)","size":11,"line":{"color":"rgba(231,41,138,1)"}},"type":"scatter","name":"NSD3_KO","textfont":{"color":"rgba(231,41,138,1)"},"error_y":{"color":"rgba(231,41,138,1)"},"error_x":{"color":"rgba(231,41,138,1)"},"line":{"color":"rgba(231,41,138,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[-21.0393980440175,-20.9270807981724,26.0451940224631],"y":[-13.5812345870276,-13.7196428625559,-17.0215219391385],"text":["parental_1","parental_2","sgNSD3_unedited_c2"],"mode":"markers","marker":{"color":"rgba(102,166,30,1)","size":11,"line":{"color":"rgba(102,166,30,1)"}},"type":"scatter","name":"parental","textfont":{"color":"rgba(102,166,30,1)"},"error_y":{"color":"rgba(102,166,30,1)"},"error_x":{"color":"rgba(102,166,30,1)"},"line":{"color":"rgba(102,166,30,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[14.0023307053612,25.0816944934824,25.2034784734504],"y":[16.95638561759,-10.2101419610534,-16.0806780587129],"text":["SETD2_KO_c10","SETD2_KO_c3","SETD2_KO_c7"],"mode":"markers","marker":{"color":"rgba(230,171,2,1)","size":11,"line":{"color":"rgba(230,171,2,1)"}},"type":"scatter","name":"SETD2_KO","textfont":{"color":"rgba(230,171,2,1)"},"error_y":{"color":"rgba(230,171,2,1)"},"error_x":{"color":"rgba(230,171,2,1)"},"line":{"color":"rgba(230,171,2,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
